@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+{% block title %}Scan Network{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+    <h4 class="mb-0">Scan Network</h4>
+    <p class="text-secondary mb-0">Enter a network range to discover devices</p>
+</div>
+
+<div class="card-panel mb-4">
+    <label class="form-label">Target Range (CIDR notation)</label>
+    <div class="d-flex gap-2">
+        <input type="text" id="targetRange" class="form-control" placeholder="e.g. 192.168.1.0/24" value="192.168.1.0/24">
+        <button class="btn btn-primary" id="startScanBtn" style="min-width:140px;">
+            <i class="fa-solid fa-play me-2"></i>Start Scan
+        </button>
+    </div>
+    <div class="form-text">
+        Not sure of your range? Your router is usually at 192.168.1.1 or 192.168.0.1 — scan that /24.
+    </div>
+</div>
+
+<div id="scanStatus" class="d-none">
+    <div class="card-panel text-center py-5">
+        <div class="spinner mx-auto mb-3" style="border-color: rgba(37,99,235,0.2); border-top-color: var(--color-primary);"></div>
+        <p class="mb-0">Scanning <strong id="scanningRange"></strong>... this can take 30-90 seconds.</p>
+    </div>
+</div>
+
+<div id="scanResults" class="d-none">
+    <div class="card-panel">
+        <h6 class="mb-3">Scan Results (<span id="resultCount">0</span> devices found)</h6>
+        <div class="table-responsive">
+            <table class="table table-custom">
+                <thead>
+                    <tr>
+                        <th>IP Address</th>
+                        <th>Hostname</th>
+                        <th>Vendor</th>
+                        <th>OS</th>
+                        <th>Open Ports</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="resultsTableBody"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.getElementById('startScanBtn').addEventListener('click', async () => {
+    const targetRange = document.getElementById('targetRange').value.trim();
+    if (!targetRange) {
+        alert('Please enter a target range.');
+        return;
+    }
+
+    document.getElementById('scanningRange').textContent = targetRange;
+    document.getElementById('scanStatus').classList.remove('d-none');
+    document.getElementById('scanResults').classList.add('d-none');
+    document.getElementById('startScanBtn').disabled = true;
+
+    try {
+        const formData = new FormData();
+        formData.append('target_range', targetRange);
+
+        const response = await fetch("{{ url_for('scanner.run_scan') }}", {
+            method: 'POST',
+            body: formData
+        });
+        const data = await response.json();
+
+        document.getElementById('scanStatus').classList.add('d-none');
+        document.getElementById('startScanBtn').disabled = false;
+
+        if (!data.success) {
+            alert('Scan failed: ' + data.error);
+            return;
+        }
+
+        renderResults(data.devices);
+    } catch (err) {
+        document.getElementById('scanStatus').classList.add('d-none');
+        document.getElementById('startScanBtn').disabled = false;
+        alert('An error occurred: ' + err.message);
+    }
+});
+
+function renderResults(devices) {
+    const tbody = document.getElementById('resultsTableBody');
+    tbody.innerHTML = '';
+
+    devices.forEach(device => {
+        const statusBadge = device.status === 'up'
+            ? '<span class="status-badge status-online">Online</span>'
+            : '<span class="status-badge status-offline">Offline</span>';
+
+        const row = `
+            <tr>
+                <td>${device.ip_address}</td>
+                <td>${device.hostname || '—'}</td>
+                <td>${device.vendor || '—'}</td>
+                <td>${device.operating_system || '—'}</td>
+                <td>${device.open_ports || '—'}</td>
+                <td>${statusBadge}</td>
+            </tr>
+        `;
+        tbody.insertAdjacentHTML('beforeend', row);
+    });
+
+    document.getElementById('resultCount').textContent = devices.length;
+    document.getElementById('scanResults').classList.remove('d-none');
+}
+</script>
+{% endblock %}

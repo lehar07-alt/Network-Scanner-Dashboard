@@ -30,8 +30,10 @@ def create_app():
     # Register blueprints
     from app.routes.main import main_bp
     from app.routes.auth import auth_bp
+    from app.routes.scanner import scanner_bp
     app.register_blueprint(main_bp)
     app.register_blueprint(auth_bp)
+    app.register_blueprint(scanner_bp)
 
     # Create database tables if they don't exist yet
     with app.app_context():
