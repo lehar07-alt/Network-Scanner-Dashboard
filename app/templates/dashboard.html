@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h4 class="mb-0">Dashboard Overview</h4>
+        <p class="text-secondary mb-0">Live snapshot of your network</p>
+    </div>
+    <button class="btn btn-primary">
+        <i class="fa-solid fa-play me-2"></i>Run New Scan
+    </button>
+</div>
+
+<!-- STAT CARDS -->
+<div class="row g-3 mb-4">
+    <div class="col-md-3 col-sm-6">
+        <div class="stat-card">
+            <div class="stat-icon bg-blue-soft"><i class="fa-solid fa-network-wired"></i></div>
+            <p class="stat-value">24</p>
+            <p class="stat-label">Total Devices</p>
+        </div>
+    </div>
+    <div class="col-md-3 col-sm-6">
+        <div class="stat-card">
+            <div class="stat-icon bg-green-soft"><i class="fa-solid fa-signal"></i></div>
+            <p class="stat-value">19</p>
+            <p class="stat-label">Online Now</p>
+        </div>
+    </div>
+    <div class="col-md-3 col-sm-6">
+        <div class="stat-card">
+            <div class="stat-icon bg-red-soft"><i class="fa-solid fa-door-open"></i></div>
+            <p class="stat-value">57</p>
+            <p class="stat-label">Open Ports</p>
+        </div>
+    </div>
+    <div class="col-md-3 col-sm-6">
+        <div class="stat-card">
+            <div class="stat-icon bg-amber-soft"><i class="fa-solid fa-clock-rotate-left"></i></div>
+            <p class="stat-value">142</p>
+            <p class="stat-label">Scans Run</p>
+        </div>
+    </div>
+</div>
+
+<!-- CHARTS -->
+<div class="row g-3 mb-4">
+    <div class="col-lg-8">
+        <div class="card-panel">
+            <h6 class="mb-3">Devices Discovered Over Time</h6>
+            <canvas id="devicesChart" height="90"></canvas>
+        </div>
+    </div>
+    <div class="col-lg-4">
+        <div class="card-panel">
+            <h6 class="mb-3">Most Common Services</h6>
+            <canvas id="servicesChart" height="90"></canvas>
+        </div>
+    </div>
+</div>
+
+<!-- DEVICE TABLE -->
+<div class="card-panel">
+    <h6 class="mb-3">Recently Discovered Devices</h6>
+    <div class="table-responsive">
+        <table class="table table-custom">
+            <thead>
+                <tr>
+                    <th>IP Address</th>
+                    <th>Hostname</th>
+                    <th>Vendor</th>
+                    <th>Open Ports</th>
+                    <th>Status</th>
+                    <th>Last Seen</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>192.168.1.1</td>
+                    <td>router.local</td>
+                    <td>TP-Link</td>
+                    <td>80, 443</td>
+                    <td><span class="status-badge status-online">Online</span></td>
+                    <td>Just now</td>
+                </tr>
+                <tr>
+                    <td>192.168.1.14</td>
+                    <td>DESKTOP-JX92</td>
+                    <td>Dell Inc.</td>
+                    <td>445, 3389</td>
+                    <td><span class="status-badge status-online">Online</span></td>
+                    <td>2 mins ago</td>
+                </tr>
+                <tr>
+                    <td>192.168.1.22</td>
+                    <td>iphone-mike</td>
+                    <td>Apple, Inc.</td>
+                    <td>—</td>
+                    <td><span class="status-badge status-offline">Offline</span></td>
+                    <td>1 hour ago</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Placeholder chart data — will be replaced with real scan data in Section 10
+    new Chart(document.getElementById('devicesChart'), {
+        type: 'line',
+        data: {
+            labels: ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],
+            datasets: [{
+                label: 'Devices',
+                data: [12, 15, 14, 18, 20, 19, 24],
+                borderColor: '#2563eb',
+                backgroundColor: 'rgba(37,99,235,0.1)',
+                tension: 0.35,
+                fill: true
+            }]
+        },
+        options: { plugins: { legend: { display: false } } }
+    });
+
+    new Chart(document.getElementById('servicesChart'), {
+        type: 'doughnut',
+        data: {
+            labels: ['HTTP', 'HTTPS', 'SSH', 'RDP', 'SMB'],
+            datasets: [{
+                data: [30, 25, 18, 15, 12],
+                backgroundColor: ['#2563eb','#16a34a','#d97706','#dc2626','#7c3aed']
+            }]
+        },
+        options: { plugins: { legend: { position: 'bottom' } } }
+    });
+</script>
+{% endblock %}
