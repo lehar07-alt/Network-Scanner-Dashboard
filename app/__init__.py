@@ -19,6 +19,9 @@ def create_app():
 
     # Flask-Login needs to know how to load a user from an ID stored in the session
     from app.models.user import User
+    from app.models.scan import Scan, ScanDevice
+    from app.models.device import Device
+    from app.models.notification import Notification
 
     @login_manager.user_loader
     def load_user(user_id):

@@ -18,6 +18,10 @@ class User(UserMixin, db.Model):
     # Settings we'll actually use starting Section 13
     theme_preference = db.Column(db.String(10), default='light')
     email_notifications = db.Column(db.Boolean, default=True)
+    # Relationships — cascade delete means deleting a user deletes their data too
+    scans = db.relationship('Scan', backref='owner', lazy=True, cascade='all, delete-orphan')
+    devices = db.relationship('Device', backref='owner', lazy=True, cascade='all, delete-orphan')
+    notifications = db.relationship('Notification', backref='owner', lazy=True, cascade='all, delete-orphan')
 
     def set_password(self, raw_password):
         """Hashes and stores the given plaintext password."""
