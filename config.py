@@ -15,9 +15,10 @@ class Config:
     SECRET_KEY = os.environ.get('SECRET_KEY', 'fallback-dev-key-do-not-use-in-prod')
 
     # Where our SQLite database file lives
+    DB_PATH = os.path.join(basedir, 'database', 'app.db').replace('\\', '/')
     SQLALCHEMY_DATABASE_URI = os.environ.get(
         'DATABASE_URL',
-        'sqlite:///' + os.path.join(basedir, 'database', 'app.db')
+        'sqlite:///' + DB_PATH
     )
 
     # Disables a feature we don't need, and it saves memory + removes a warning

@@ -63,21 +63,34 @@
                 </button>
                 <div class="dropdown">
                     <button class="btn d-flex align-items-center gap-2 border-0" data-bs-toggle="dropdown">
-                        <img src="https://ui-avatars.com/api/?name=John+Doe&background=2563eb&color=fff"
-                             class="rounded-circle" width="34" height="34" alt="profile">
+                        <img src="https://ui-avatars.com/api/?name={{ current_user.username }}&background=2563eb&color=fff"
+                            class="rounded-circle" width="34" height="34" alt="profile">
                     </button>
                     <ul class="dropdown-menu dropdown-menu-end">
+                        <li><h6 class="dropdown-header">{{ current_user.username }}</h6></li>
                         <li><a class="dropdown-item" href="#"><i class="fa-solid fa-user me-2"></i>Profile</a></li>
                         <li><a class="dropdown-item" href="#"><i class="fa-solid fa-gear me-2"></i>Settings</a></li>
                         <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item" href="#"><i class="fa-solid fa-arrow-right-from-bracket me-2"></i>Logout</a></li>
+                        <li><a class="dropdown-item" href="{{ url_for('auth.logout') }}"><i class="fa-solid fa-arrow-right-from-bracket me-2"></i>Logout</a></li>
                     </ul>
                 </div>
+                
             </div>
         </div>
 
         <!-- PAGE CONTENT -->
         <div class="content-area">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
             {% block content %}{% endblock %}
         </div>
     </div>
