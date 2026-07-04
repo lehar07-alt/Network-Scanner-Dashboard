@@ -17,35 +17,35 @@
     <div class="col-md-3 col-sm-6">
         <div class="stat-card">
             <div class="stat-icon bg-blue-soft"><i class="fa-solid fa-network-wired"></i></div>
-            <p class="stat-value">24</p>
+            <p class="stat-value" id="statTotalDevices">0</p>
             <p class="stat-label">Total Devices</p>
         </div>
     </div>
     <div class="col-md-3 col-sm-6">
         <div class="stat-card">
             <div class="stat-icon bg-green-soft"><i class="fa-solid fa-signal"></i></div>
-            <p class="stat-value">19</p>
+            <p class="stat-value" id="statOnlineDevices">0</p>
             <p class="stat-label">Online Now</p>
         </div>
     </div>
     <div class="col-md-3 col-sm-6">
         <div class="stat-card">
-            <div class="stat-icon bg-blue-soft"><i class="fa-solid fa-door-open"></i></div>
-            <p class="stat-value">57</p>
+            <div class="stat-icon bg-red-soft"><i class="fa-solid fa-door-open"></i></div>
+            <p class="stat-value" id="statOpenPorts">0</p>
             <p class="stat-label">Open Ports</p>
         </div>
     </div>
     <div class="col-md-3 col-sm-6">
         <div class="stat-card">
             <div class="stat-icon bg-amber-soft"><i class="fa-solid fa-clock-rotate-left"></i></div>
-            <p class="stat-value">142</p>
+            <p class="stat-value" id="statTotalScans">0</p>
             <p class="stat-label">Scans Run</p>
         </div>
     </div>
     <div class="col-md-3 col-sm-6">
         <div class="stat-card">
             <div class="stat-icon bg-red-soft"><i class="fa-solid fa-circle-xmark"></i></div>
-            <p class="stat-value">12</p>
+            <p class="stat-value"id="statFailedScans">0</p>
             <p class="stat-label">Failed Scans</p>
         </div>
     </div>
@@ -63,6 +63,14 @@
         <div class="card-panel">
             <h6 class="mb-3">Most Common Services</h6>
             <canvas id="servicesChart" height="90"></canvas>
+        </div>
+    </div>
+</div>
+<div class="row g-3 mb-4">
+    <div class="col-lg-4">
+        <div class="card-panel">
+            <h6 class="mb-3">Online vs Offline Devices</h6>
+            <canvas id="onlineStatusChart" height="90"></canvas>
         </div>
     </div>
 </div>
@@ -115,14 +123,28 @@
 
 {% block scripts %}
 <script>
-    // Placeholder chart data — will be replaced with real scan data in Section 10
+async function loadDashboardStats() {
+    const response = await fetch("{{ url_for('api.dashboard_stats') }}");
+    const data = await response.json();
+
+    document.getElementById('statTotalDevices').textContent = data.total_devices;
+    document.getElementById('statOnlineDevices').textContent = data.online_devices;
+    document.getElementById('statOpenPorts').textContent = data.total_open_ports;
+    document.getElementById('statTotalScans').textContent = data.total_scans;
+    document.getElementById('statFailedScans').textContent = data.failed_scans;
+}
+
+async function loadDevicesOverTimeChart() {
+    const response = await fetch("{{ url_for('api.devices_over_time') }}");
+    const data = await response.json();
+
     new Chart(document.getElementById('devicesChart'), {
         type: 'line',
         data: {
-            labels: ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],
+            labels: data.labels,
             datasets: [{
-                label: 'Devices',
-                data: [12, 15, 14, 18, 20, 19, 24],
+                label: 'Devices Discovered',
+                data: data.counts,
                 borderColor: '#2563eb',
                 backgroundColor: 'rgba(37,99,235,0.1)',
                 tension: 0.35,
@@ -131,17 +153,56 @@
         },
         options: { plugins: { legend: { display: false } } }
     });
+}
+
+async function loadServicesChart() {
+    const response = await fetch("{{ url_for('api.common_services') }}");
+    const data = await response.json();
 
     new Chart(document.getElementById('servicesChart'), {
         type: 'doughnut',
         data: {
-            labels: ['HTTP', 'HTTPS', 'SSH', 'RDP', 'SMB'],
+            labels: data.labels.length ? data.labels : ['No data yet'],
             datasets: [{
-                data: [30, 25, 18, 15, 12],
+                data: data.counts.length ? data.counts : [1],
                 backgroundColor: ['#2563eb','#16a34a','#d97706','#dc2626','#7c3aed']
             }]
         },
         options: { plugins: { legend: { position: 'bottom' } } }
     });
+}
+
+async function loadOnlineStatusChart() {
+    const response = await fetch("{{ url_for('api.online_status') }}");
+    const data = await response.json();
+
+    new Chart(document.getElementById('onlineStatusChart'), {
+        type: 'pie',
+        data: {
+            labels: data.labels,
+            datasets: [{
+                data: data.counts,
+                backgroundColor: ['#16a34a', '#dc2626']
+            }]
+        },
+        options: { plugins: { legend: { position: 'bottom' } } }
+    });
+}
+
+// Load everything when the dashboard page opens
+loadDashboardStats();
+loadDevicesOverTimeChart();
+loadServicesChart();
+loadOnlineStatusChart();
 </script>
 {% endblock %}
+
+
+
+<div class="col-md-3 col-sm-6">
+        <div class="stat-card">
+            <div class="stat-icon bg-red-soft"><i class="fa-solid fa-circle-xmark"></i></div>
+            <p class="stat-value">12</p>
+            <p class="stat-label">Failed Scans</p>
+        </div>
+    </div>
