@@ -3,33 +3,21 @@ from datetime import datetime
 
 
 def run_network_scan(target_range):
-    """
-    Runs an Nmap scan against the given target range (e.g. '192.168.1.0/24')
-    and returns a list of dicts, one per discovered host.
-
-    Uses Nmap arguments:
-      -sn  : ping scan only (host discovery), no port scan — fast first pass
-    Then for hosts that are up, we run a fuller scan:
-      -O   : attempt OS detection (requires admin/root privileges)
-      -sV  : service/version detection on open ports
-    """
-    scanner = nmap.PortScanner()
-
     results = []
 
+    # Wrap the scanner creation itself — this is where a missing nmap binary
+    # actually raises an error, not just the .scan() call
     try:
-        # Quick check: verify the nmap binary is actually reachable.
-        # On restricted cloud environments, this will fail immediately with a clear reason.
-        scanner.nmap_version()
+        scanner = nmap.PortScanner()
     except Exception:
         return {
             'success': False,
             'devices': [],
             'error': (
                 'Network scanning is unavailable in this environment. '
-                'This tool requires direct local network access, which cloud-hosted '
-                'environments do not provide by design. Please run this application '
-                'locally to use the live scanning feature.'
+                'This tool requires direct local network access and the Nmap binary, '
+                'which cloud-hosted environments do not provide by design. Please run '
+                'this application locally to use the live scanning feature.'
             )
         }
 
