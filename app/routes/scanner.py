@@ -7,6 +7,9 @@ from app.models.scan import Scan, ScanDevice
 from app.models.device import Device
 from app.services.scanner import run_network_scan
 from app.services.email_service import send_new_device_alert
+from flask import Response
+from datetime import datetime
+from app.services.export_service import export_scans_csv
 
 scanner_bp = Blueprint('scanner', __name__, url_prefix='/scan')
 
@@ -184,3 +187,16 @@ def delete_scan(scan_id):
     db.session.commit()
     flash('Scan deleted successfully.', 'success')
     return redirect(url_for('scanner.history'))
+
+@scanner_bp.route('/history/export')
+@login_required
+def export_history():
+    scans = Scan.query.filter_by(user_id=current_user.id).order_by(Scan.started_at.desc()).all()
+    content = export_scans_csv(scans)
+    timestamp = datetime.utcnow().strftime('%Y%m%d_%H%M%S')
+
+    return Response(
+        content,
+        mimetype='text/csv',
+        headers={'Content-Disposition': f'attachment; filename=scan_history_{timestamp}.csv'}
+    )

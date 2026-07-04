@@ -5,6 +5,8 @@ from app.models.scan import ScanDevice
 from datetime import datetime
 from flask import request
 from app.extensions import db
+from flask import Response
+from app.services.export_service import export_devices_csv, export_devices_json, export_devices_pdf
 
 devices_bp = Blueprint('devices', __name__, url_prefix='/devices')
 
@@ -107,3 +109,38 @@ def search_results():
         ).all()
 
     return render_template('search_results.html', devices=devices, query_text=query_text)
+
+@devices_bp.route('/export/<file_format>')
+@login_required
+def export_devices(file_format):
+    """Exports all of the current user's devices in the requested format."""
+
+    devices = Device.query.filter_by(user_id=current_user.id).order_by(Device.ip_address).all()
+    timestamp = datetime.utcnow().strftime('%Y%m%d_%H%M%S')
+
+    if file_format == 'csv':
+        content = export_devices_csv(devices)
+        return Response(
+            content,
+            mimetype='text/csv',
+            headers={'Content-Disposition': f'attachment; filename=devices_export_{timestamp}.csv'}
+        )
+
+    elif file_format == 'json':
+        content = export_devices_json(devices)
+        return Response(
+            content,
+            mimetype='application/json',
+            headers={'Content-Disposition': f'attachment; filename=devices_export_{timestamp}.json'}
+        )
+
+    elif file_format == 'pdf':
+        content = export_devices_pdf(devices, current_user.username)
+        return Response(
+            content,
+            mimetype='application/pdf',
+            headers={'Content-Disposition': f'attachment; filename=devices_export_{timestamp}.pdf'}
+        )
+
+    else:
+        abort(404)
