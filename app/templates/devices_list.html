@@ -7,6 +7,57 @@
     <p class="text-secondary mb-0">Every unique device ever discovered on your network</p>
 </div>
 
+<!-- Filter Bar -->
+<div class="card-panel mb-4">
+    <form method="GET" class="row g-2 align-items-end">
+        <div class="col-md-3">
+            <label class="form-label small">Status</label>
+            <select name="status" class="form-select">
+                <option value="" {% if status_filter == '' %}selected{% endif %}>All</option>
+                <option value="online" {% if status_filter == 'online' %}selected{% endif %}>Online</option>
+                <option value="offline" {% if status_filter == 'offline' %}selected{% endif %}>Offline</option>
+            </select>
+        </div>
+        <div class="col-md-3">
+            <label class="form-label small">Operating System</label>
+            <select name="os" class="form-select">
+                <option value="">All</option>
+                {% for os in available_os %}
+                <option value="{{ os }}" {% if os_filter == os %}selected{% endif %}>{{ os }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-3">
+            <label class="form-label small">Vendor</label>
+            <select name="vendor" class="form-select">
+                <option value="">All</option>
+                {% for vendor in available_vendors %}
+                <option value="{{ vendor }}" {% if vendor_filter == vendor %}selected{% endif %}>{{ vendor }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-2">
+            <label class="form-label small">Subnet</label>
+            <select name="subnet" class="form-select">
+                <option value="">All</option>
+                {% for subnet in available_subnets %}
+                <option value="{{ subnet }}" {% if subnet_filter == subnet %}selected{% endif %}>{{ subnet }}.0/24</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-1">
+            <button type="submit" class="btn btn-primary w-100"><i class="fa-solid fa-filter"></i></button>
+        </div>
+    </form>
+    {% if status_filter or os_filter or vendor_filter or subnet_filter %}
+    <div class="mt-2">
+        <a href="{{ url_for('devices.devices_list') }}" class="small text-secondary">
+            <i class="fa-solid fa-xmark me-1"></i>Clear all filters
+        </a>
+    </div>
+    {% endif %}
+</div>
+
 <div class="card-panel">
     <div class="table-responsive">
         <table class="table table-custom">

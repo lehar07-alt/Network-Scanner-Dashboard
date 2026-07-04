@@ -8,14 +8,55 @@ from app.extensions import db
 
 devices_bp = Blueprint('devices', __name__, url_prefix='/devices')
 
-
 @devices_bp.route('/')
 @login_required
 def devices_list():
-    """Shows every unique device ever discovered for this user."""
-    devices = Device.query.filter_by(user_id=current_user.id).order_by(Device.last_seen.desc()).all()
-    return render_template('devices_list.html', devices=devices)
+    """Shows every unique device ever discovered for this user, with filters."""
 
+    status_filter = request.args.get('status', '')
+    os_filter = request.args.get('os', '')
+    vendor_filter = request.args.get('vendor', '')
+    subnet_filter = request.args.get('subnet', '')
+
+    query = Device.query.filter_by(user_id=current_user.id)
+
+    if status_filter == 'online':
+        query = query.filter_by(is_online=True)
+    elif status_filter == 'offline':
+        query = query.filter_by(is_online=False)
+
+    if os_filter:
+        query = query.filter_by(operating_system=os_filter)
+
+    if vendor_filter:
+        query = query.filter_by(vendor=vendor_filter)
+
+    if subnet_filter:
+        # subnet_filter looks like "192.168.31" — match any IP starting with it
+        query = query.filter(Device.ip_address.like(f'{subnet_filter}.%'))
+
+    devices = query.order_by(Device.last_seen.desc()).all()
+
+    # --- Build filter dropdown options from this user's actual data ---
+    all_user_devices = Device.query.filter_by(user_id=current_user.id).all()
+
+    available_os = sorted(set(d.operating_system for d in all_user_devices if d.operating_system))
+    available_vendors = sorted(set(d.vendor for d in all_user_devices if d.vendor))
+    available_subnets = sorted(set(
+        '.'.join(d.ip_address.split('.')[:3]) for d in all_user_devices if d.ip_address
+    ))
+
+    return render_template(
+        'devices_list.html',
+        devices=devices,
+        status_filter=status_filter,
+        os_filter=os_filter,
+        vendor_filter=vendor_filter,
+        subnet_filter=subnet_filter,
+        available_os=available_os,
+        available_vendors=available_vendors,
+        available_subnets=available_subnets
+    )
 
 @devices_bp.route('/<int:device_id>')
 @login_required
