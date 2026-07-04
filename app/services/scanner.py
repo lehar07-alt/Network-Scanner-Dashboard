@@ -18,6 +18,22 @@ def run_network_scan(target_range):
     results = []
 
     try:
+        # Quick check: verify the nmap binary is actually reachable.
+        # On restricted cloud environments, this will fail immediately with a clear reason.
+        scanner.nmap_version()
+    except Exception:
+        return {
+            'success': False,
+            'devices': [],
+            'error': (
+                'Network scanning is unavailable in this environment. '
+                'This tool requires direct local network access, which cloud-hosted '
+                'environments do not provide by design. Please run this application '
+                'locally to use the live scanning feature.'
+            )
+        }
+
+    try:
         # Step 1: quick host discovery — who's actually alive on this range?
         scanner.scan(hosts=target_range, arguments='-sn')
         live_hosts = scanner.all_hosts()
