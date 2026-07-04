@@ -26,9 +26,9 @@ A full-stack network scanning and monitoring dashboard built with Flask, SQLAlch
 
 ## Screenshots
 
-| Dashboard | Scan Network | Device Detail |
-|---|---|---|
-| ![Dashboard](docs/screenshots/dashboard.png) | ![Scan](docs/screenshots/scan.png) | ![Device Detail](docs/screenshots/device-detail.png) |
+| Dark mode Dashboard | Scan Network | Devices List | Device Detail | login page | Settings page |
+|---|---|---|---|---|---|
+| ![Dashboard](docs/screenshots/dashboard.png) | ![Scan](docs/screenshots/scan_done.png) | ![Devices List](docs/screenshots/devices_list.png) | ![Device Detail](docs/screenshots/device_detail.png) | ![login page](docs/screenshots/login_page.png) | ![settings](docs/screenshots/settings_upper.png) |
 
 ## Tech Stack
 
