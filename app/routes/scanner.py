@@ -6,6 +6,7 @@ from app.extensions import db
 from app.models.scan import Scan, ScanDevice
 from app.models.device import Device
 from app.services.scanner import run_network_scan
+from app.services.email_service import send_new_device_alert
 
 scanner_bp = Blueprint('scanner', __name__, url_prefix='/scan')
 
@@ -98,6 +99,10 @@ def run_scan():
             )
             db.session.add(device_row)
             db.session.flush()  # assigns device_row.id without a full commit yet
+
+            # Notify the user by email, only if they have notifications enabled
+            if current_user.email_notifications:
+                send_new_device_alert(current_user.email, device_row)
 
         # Link this device to this scan, with THIS scan's port findings
         link = ScanDevice(
