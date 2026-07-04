@@ -29,3 +29,11 @@ if (darkModeToggle) {
         }
     });
 }
+
+// Make any row with class "clickable-row" navigate to its data-href on click
+document.addEventListener('click', (event) => {
+    const row = event.target.closest('.clickable-row');
+    if (row && row.dataset.href) {
+        window.location.href = row.dataset.href;
+    }
+});

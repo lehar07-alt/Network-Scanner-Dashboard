@@ -91,30 +91,24 @@
                 </tr>
             </thead>
             <tbody>
-                <tr>
-                    <td>192.168.1.1</td>
-                    <td>router.local</td>
-                    <td>TP-Link</td>
-                    <td>80, 443</td>
-                    <td><span class="status-badge status-online">Online</span></td>
-                    <td>Just now</td>
-                </tr>
-                <tr>
-                    <td>192.168.1.14</td>
-                    <td>DESKTOP-JX92</td>
-                    <td>Dell Inc.</td>
-                    <td>445, 3389</td>
-                    <td><span class="status-badge status-online">Online</span></td>
-                    <td>2 mins ago</td>
-                </tr>
-                <tr>
-                    <td>192.168.1.22</td>
-                    <td>iphone-mike</td>
-                    <td>Apple, Inc.</td>
+                {% for device in recent_devices %}
+                <tr class="clickable-row" data-href="{{ url_for('devices.device_detail', device_id=device.id) }}" style="cursor:pointer;"></tr>
+                    <td>{{ device.ip_address }}</td>
+                    <td>{{ device.hostname or '—' }}</td>
+                    <td>{{ device.vendor or '—' }}</td>
                     <td>—</td>
-                    <td><span class="status-badge status-offline">Offline</span></td>
-                    <td>1 hour ago</td>
+                    <td>
+                        {% if device.is_online %}
+                            <span class="status-badge status-online">Online</span>
+                        {% else %}
+                            <span class="status-badge status-offline">Offline</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ device.last_seen.strftime('%b %d, %I:%M %p') }}</td>
                 </tr>
+                {% else %}
+                <tr><td colspan="6" class="text-center text-secondary py-4">No devices yet.</td></tr>
+                {% endfor %}
             </tbody>
         </table>
     </div>

@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% block title %}{{ device.ip_address }}{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+    <a href="{{ url_for('devices.devices_list') }}" class="text-secondary small">
+        <i class="fa-solid fa-arrow-left me-1"></i>Back to Devices
+    </a>
+    <h4 class="mb-0 mt-2">{{ device.hostname or device.ip_address }}</h4>
+    <p class="text-secondary mb-0">{{ device.ip_address }}</p>
+</div>
+
+<!-- Device Profile Card -->
+<div class="row g-3 mb-4">
+    <div class="col-md-3 col-sm-6">
+        <div class="card-panel">
+            <p class="stat-label mb-1">MAC Address</p>
+            <p class="mb-0 fw-semibold">{{ device.mac_address or '—' }}</p>
+        </div>
+    </div>
+    <div class="col-md-3 col-sm-6">
+        <div class="card-panel">
+            <p class="stat-label mb-1">Vendor</p>
+            <p class="mb-0 fw-semibold">{{ device.vendor or '—' }}</p>
+        </div>
+    </div>
+    <div class="col-md-3 col-sm-6">
+        <div class="card-panel">
+            <p class="stat-label mb-1">Operating System</p>
+            <p class="mb-0 fw-semibold">{{ device.operating_system or '—' }}</p>
+        </div>
+    </div>
+    <div class="col-md-3 col-sm-6">
+        <div class="card-panel">
+            <p class="stat-label mb-1">Current Status</p>
+            {% if device.is_online %}
+                <span class="status-badge status-online">Online</span>
+            {% else %}
+                <span class="status-badge status-offline">Offline</span>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-6">
+        <div class="card-panel">
+            <p class="stat-label mb-1">First Seen</p>
+            <p class="mb-0 fw-semibold">{{ device.first_seen.strftime('%b %d, %Y %I:%M %p') }}</p>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card-panel">
+            <p class="stat-label mb-1">Last Seen</p>
+            <p class="mb-0 fw-semibold">{{ device.last_seen.strftime('%b %d, %Y %I:%M %p') }}</p>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card-panel">
+            <p class="stat-label mb-1">Known For</p>
+            <p class="mb-0 fw-semibold">
+                {% if days_known == 0 %}Discovered today{% else %}{{ days_known }} day{{ 's' if days_known != 1 else '' }}{% endif %}
+            </p>
+        </div>
+    </div>
+</div>
+
+<!-- Scan History for this device -->
+<div class="card-panel">
+    <h6 class="mb-3">Scan History for This Device</h6>
+    <div class="table-responsive">
+        <table class="table table-custom">
+            <thead>
+                <tr>
+                    <th>Detected At</th>
+                    <th>Target Range Scanned</th>
+                    <th>Open Ports</th>
+                    <th>Services</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for link in scan_history %}
+                <tr>
+                    <td>{{ link.detected_at.strftime('%b %d, %Y %I:%M %p') }}</td>
+                    <td>{{ link.scan.target_range }}</td>
+                    <td>{{ link.open_ports or '—' }}</td>
+                    <td>{{ link.services or '—' }}</td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="4" class="text-center text-secondary py-4">No scan history for this device yet.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
