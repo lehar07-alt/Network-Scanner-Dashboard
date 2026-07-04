@@ -9,7 +9,7 @@ A full-stack network scanning and monitoring dashboard built with Flask, SQLAlch
 
 **[Live Demo](https://netscan-dashboard.onrender.com)** — Note: live scanning requires local network access and is disabled on the cloud demo (see [Deployment Notes](#deployment-notes) below). Clone and run locally to try real scanning on your own network.
 
-![Dashboard Screenshot](docs/screenshots/dashboard.png)
+![Dashboard Screenshot](docs/screenshots/dashboard_upper.png)
 
 ## Features
 
