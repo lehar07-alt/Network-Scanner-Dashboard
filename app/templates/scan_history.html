@@ -98,6 +98,7 @@
                     </td>
                     <td>
                         <form method="POST" action="{{ url_for('scanner.delete_scan', scan_id=scan.id) }}"
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                               onsubmit="return confirm('Delete this scan? This cannot be undone.');" class="d-inline">
                             <button type="submit" class="btn btn-sm btn-outline-danger">
                                 <i class="fa-solid fa-trash"></i>

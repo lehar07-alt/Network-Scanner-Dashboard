@@ -12,6 +12,7 @@
         <div class="card-panel mb-4">
             <h6 class="mb-3"><i class="fa-solid fa-user me-2"></i>Account Email</h6>
             <form method="POST" action="{{ url_for('settings.update_email') }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 <div class="mb-3">
                     <label class="form-label">Email Address</label>
                     <input type="email" name="email" class="form-control" value="{{ current_user.email }}" required>
@@ -23,6 +24,7 @@
         <div class="card-panel">
             <h6 class="mb-3"><i class="fa-solid fa-lock me-2"></i>Change Password</h6>
             <form method="POST" action="{{ url_for('settings.update_password') }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 <div class="mb-3">
                     <label class="form-label">Current Password</label>
                     <input type="password" name="current_password" class="form-control" required>
@@ -45,6 +47,7 @@
         <div class="card-panel mb-4">
             <h6 class="mb-3"><i class="fa-solid fa-sliders me-2"></i>Preferences</h6>
             <form method="POST" action="{{ url_for('settings.update_preferences') }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 <div class="mb-3">
                     <label class="form-label">Theme</label>
                     <select name="theme" class="form-select">
@@ -71,6 +74,7 @@
             <h6 class="mb-3 text-danger"><i class="fa-solid fa-triangle-exclamation me-2"></i>Danger Zone</h6>
             <p class="text-secondary small">Deleting your account permanently removes all your scans, devices, and notifications. This cannot be undone.</p>
             <form method="POST" action="{{ url_for('settings.delete_account') }}"
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                   onsubmit="return confirm('Are you absolutely sure? This cannot be undone.');">
                 <div class="mb-3">
                     <label class="form-label">Type your username (<strong>{{ current_user.username }}</strong>) to confirm</label>

@@ -2,11 +2,14 @@ from flask import Blueprint, render_template, redirect, url_for, flash, request
 from flask_login import login_user, logout_user, login_required, current_user
 from app.extensions import db
 from app.models.user import User
+from app.extensions import limiter
+from email_validator import validate_email, EmailNotValidError
 
 auth_bp = Blueprint('auth', __name__, url_prefix='/auth')
 
 
 @auth_bp.route('/register', methods=['GET', 'POST'])
+@limiter.limit("3 per minute")
 def register():
     if current_user.is_authenticated:
         return redirect(url_for('main.dashboard'))
@@ -20,6 +23,12 @@ def register():
         # --- Basic validation ---
         if not username or not email or not password:
             flash('All fields are required.', 'danger')
+            return redirect(url_for('auth.register'))
+        
+        try:
+            validate_email(email)
+        except EmailNotValidError:
+            flash('Please provide a valid email address.', 'danger')
             return redirect(url_for('auth.register'))
 
         if password != confirm_password:
@@ -51,6 +60,7 @@ def register():
 
 
 @auth_bp.route('/login', methods=['GET', 'POST'])
+@limiter.limit("5 per minute")
 def login():
     if current_user.is_authenticated:
         return redirect(url_for('main.dashboard'))
@@ -98,3 +108,4 @@ def forgot_password():
         return redirect(url_for('auth.login'))
 
     return render_template('auth/forgot_password.html')
+

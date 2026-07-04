@@ -1,3 +1,5 @@
+// Grab the CSRF token once, reuse it for all fetch() calls that modify data
+const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
 // Sidebar toggle for mobile
 const sidebarToggle = document.getElementById('sidebarToggle');
 const sidebar = document.getElementById('sidebar');
@@ -37,7 +39,11 @@ if (darkModeToggle) {
             if (notifCheckbox && notifCheckbox.checked) {
                 formData.append('email_notifications', 'on');
             }
-            await fetch("/settings/update-preferences", { method: 'POST', body: formData });
+            await fetch("/settings/update-preferences", {
+                method: 'POST',
+                headers: { 'X-CSRFToken': csrfToken },
+                body: formData
+            });
         } catch (err) {
             console.error('Failed to save theme preference:', err);
         }

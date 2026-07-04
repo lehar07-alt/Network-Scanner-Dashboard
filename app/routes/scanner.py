@@ -10,6 +10,7 @@ from app.services.email_service import send_new_device_alert
 from flask import Response
 from datetime import datetime
 from app.services.export_service import export_scans_csv
+from app.extensions import limiter
 
 scanner_bp = Blueprint('scanner', __name__, url_prefix='/scan')
 
@@ -23,6 +24,7 @@ def scan_page():
 
 @scanner_bp.route('/run', methods=['POST'])
 @login_required
+@limiter.limit("10 per hour")
 def run_scan():
     """
     Handles the actual scan request (called via JS fetch, returns JSON).
