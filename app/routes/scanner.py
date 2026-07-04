@@ -56,13 +56,23 @@ def run_scan():
             'scan_duration_seconds': scan_duration_seconds
         }), 500
     # --- Save each discovered device ---
+    # --- Save each discovered device ---
     devices_found_count = 0
     for device_data in result['devices']:
-        # Does this device (by MAC) already exist for this user?
         existing_device = None
+
+        # 1st choice: match by MAC address — most reliable, survives IP changes
         if device_data['mac_address']:
             existing_device = Device.query.filter_by(
                 mac_address=device_data['mac_address'],
+                user_id=current_user.id
+            ).first()
+
+        # Fallback: no MAC available (common without admin privileges) —
+        # match by IP address instead, so we don't create endless duplicates
+        if not existing_device:
+            existing_device = Device.query.filter_by(
+                ip_address=device_data['ip_address'],
                 user_id=current_user.id
             ).first()
 
