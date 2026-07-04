@@ -1,5 +1,10 @@
 # NetScan Dashboard 🛡️
 
+![Python](https://img.shields.io/badge/Python-3.11-blue)
+![Flask](https://img.shields.io/badge/Flask-3.x-black)
+![License](https://img.shields.io/badge/License-MIT-green)
+![Status](https://img.shields.io/badge/Status-Live-success)
+
 A full-stack network scanning and monitoring dashboard built with Flask, SQLAlchemy, and Nmap — discover devices on your network, track them over time, and get notified when something new appears.
 
 **[Live Demo](https://netscan-dashboard.onrender.com)** — Note: live scanning requires local network access and is disabled on the cloud demo (see [Deployment Notes](#deployment-notes) below). Clone and run locally to try real scanning on your own network.
