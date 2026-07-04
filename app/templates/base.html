@@ -47,10 +47,13 @@
                 <button class="icon-btn d-lg-none" id="sidebarToggle">
                     <i class="fa-solid fa-bars"></i>
                 </button>
-                <div class="search-box">
-                    <i class="fa-solid fa-magnifying-glass text-secondary"></i>
-                    <input type="text" placeholder="Search devices, IPs, ports...">
-                </div>
+                <form action="{{ url_for('devices.search_results') }}" method="GET" id="searchForm">
+                    <div class="search-box position-relative">
+                        <i class="fa-solid fa-magnifying-glass text-secondary"></i>
+                        <input type="text" name="q" id="globalSearchInput" placeholder="Search devices, IPs, ports..." autocomplete="off">
+                        <div id="searchDropdown" class="d-none" style="position:absolute; top:110%; left:0; right:0; background:var(--bg-card); border:1px solid var(--border-color); border-radius:8px; box-shadow:var(--shadow-md); z-index:1500; max-height:300px; overflow-y:auto;"></div>
+                    </div>
+                </form>
             </div>
 
             <div class="d-flex align-items-center gap-2">

@@ -1,10 +1,11 @@
 from datetime import datetime, timedelta
 from collections import Counter
-from flask import Blueprint, jsonify
+from flask import Blueprint, jsonify, request
 from flask_login import login_required, current_user
 from app.extensions import db
 from app.models.scan import Scan, ScanDevice
 from app.models.device import Device
+
 
 api_bp = Blueprint('api', __name__, url_prefix='/api')
 
@@ -104,4 +105,35 @@ def online_status():
     return jsonify({
         'labels': ['Online', 'Offline'],
         'counts': [online_count, offline_count]
+    })
+
+@api_bp.route('/search')
+@login_required
+def search():
+    """Live search-as-you-type — returns top matching devices as JSON."""
+    query_text = request.args.get('q', '').strip()
+
+    if not query_text or len(query_text) < 2:
+        return jsonify({'results': []})
+
+    matches = Device.query.filter(
+        Device.user_id == current_user.id,
+        db.or_(
+            Device.ip_address.ilike(f'%{query_text}%'),
+            Device.hostname.ilike(f'%{query_text}%'),
+            Device.vendor.ilike(f'%{query_text}%'),
+            Device.mac_address.ilike(f'%{query_text}%')
+        )
+    ).limit(8).all()
+
+    return jsonify({
+        'results': [
+            {
+                'id': d.id,
+                'ip_address': d.ip_address,
+                'hostname': d.hostname or 'Unknown',
+                'vendor': d.vendor or 'Unknown'
+            }
+            for d in matches
+        ]
     })

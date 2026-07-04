@@ -3,6 +3,8 @@ from flask_login import login_required, current_user
 from app.models.device import Device
 from app.models.scan import ScanDevice
 from datetime import datetime
+from flask import request
+from app.extensions import db
 
 devices_bp = Blueprint('devices', __name__, url_prefix='/devices')
 
@@ -42,3 +44,25 @@ def device_detail(device_id):
         scan_history=scan_history,
         days_known=days_known
     )
+
+
+
+@devices_bp.route('/search')
+@login_required
+def search_results():
+    """Full search results page, triggered by pressing Enter in the search box."""
+    query_text = request.args.get('q', '').strip()
+
+    devices = []
+    if query_text:
+        devices = Device.query.filter(
+            Device.user_id == current_user.id,
+            db.or_(
+                Device.ip_address.ilike(f'%{query_text}%'),
+                Device.hostname.ilike(f'%{query_text}%'),
+                Device.vendor.ilike(f'%{query_text}%'),
+                Device.mac_address.ilike(f'%{query_text}%')
+            )
+        ).all()
+
+    return render_template('search_results.html', devices=devices, query_text=query_text)

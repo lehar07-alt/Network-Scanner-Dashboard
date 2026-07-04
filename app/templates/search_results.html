@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}Search Results{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+    <h4 class="mb-0">Search Results</h4>
+    <p class="text-secondary mb-0">Showing results for "<strong>{{ query_text }}</strong>"</p>
+</div>
+
+<div class="card-panel">
+    <div class="table-responsive">
+        <table class="table table-custom">
+            <thead>
+                <tr>
+                    <th>IP Address</th>
+                    <th>Hostname</th>
+                    <th>Vendor</th>
+                    <th>Status</th>
+                    <th>Last Seen</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for device in devices %}
+                <tr class="clickable-row" data-href="{{ url_for('devices.device_detail', device_id=device.id) }}" style="cursor:pointer;">
+                    <td>{{ device.ip_address }}</td>
+                    <td>{{ device.hostname or '—' }}</td>
+                    <td>{{ device.vendor or '—' }}</td>
+                    <td>
+                        {% if device.is_online %}
+                            <span class="status-badge status-online">Online</span>
+                        {% else %}
+                            <span class="status-badge status-offline">Offline</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ device.last_seen.strftime('%b %d, %Y %I:%M %p') }}</td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="5" class="text-center text-secondary py-4">No devices matched your search.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
