@@ -33,7 +33,7 @@
             <a class="nav-link" href="{{ url_for('devices.devices_list') }}">
                 <i class="fa-solid fa-network-wired"></i> Devices
             </a>
-            <a class="nav-link" href="#">
+            <a class="nav-link" href="{{ url_for('settings.settings_page') }}">
                 <i class="fa-solid fa-gear"></i> Settings
             </a>
         </nav>
@@ -69,11 +69,7 @@
                     <ul class="dropdown-menu dropdown-menu-end">
                         <li><h6 class="dropdown-header">{{ current_user.username }}</h6></li>
                         <li><a class="dropdown-item" href="#"><i class="fa-solid fa-user me-2"></i>Profile</a></li>
-                        <li>
-                            <a class="nav-link" href="{{ url_for('settings.settings_page') }}">
-                                <i class="fa-solid fa-gear"></i> Settings
-                            </a>
-                        </li>
+                        <li><a class="dropdown-item" href="{{ url_for('settings.settings_page') }}"><i class="fa-solid fa-gear me-2"></i>Settings</a></li>
                         <li><hr class="dropdown-divider"></li>
                         <li><a class="dropdown-item" href="{{ url_for('auth.logout') }}"><i class="fa-solid fa-arrow-right-from-bracket me-2"></i>Logout</a></li>
                     </ul>
