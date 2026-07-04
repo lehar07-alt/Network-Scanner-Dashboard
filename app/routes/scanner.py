@@ -1,4 +1,5 @@
 from datetime import datetime
+import time
 from flask import Blueprint, render_template, request, jsonify, flash, redirect, url_for
 from flask_login import login_required, current_user
 from app.extensions import db
@@ -38,15 +39,22 @@ def run_scan():
     db.session.commit()
 
     # --- Run the actual Nmap scan ---
+    # --- Run the actual Nmap scan, timed ---
+    scan_start_time = time.time()
     result = run_network_scan(target_range)
+    scan_end_time = time.time()
+    scan_duration_seconds = round(scan_end_time - scan_start_time, 2)
 
     if not result['success']:
         scan_record.status = 'failed'
         scan_record.error_message = result['error']
         scan_record.completed_at = datetime.utcnow()
         db.session.commit()
-        return jsonify({'success': False, 'error': result['error']}), 500
-
+        return jsonify({
+            'success': False,
+            'error': result['error'],
+            'scan_duration_seconds': scan_duration_seconds
+        }), 500
     # --- Save each discovered device ---
     devices_found_count = 0
     for device_data in result['devices']:
@@ -101,5 +109,6 @@ def run_scan():
         'success': True,
         'scan_id': scan_record.id,
         'devices_found': devices_found_count,
-        'devices': result['devices']
+        'devices': result['devices'],
+        'scan_duration_seconds': scan_duration_seconds
     })

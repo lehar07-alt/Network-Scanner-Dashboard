@@ -30,6 +30,7 @@
 <div id="scanResults" class="d-none">
     <div class="card-panel">
         <h6 class="mb-3">Scan Results (<span id="resultCount">0</span> devices found)</h6>
+        <p class="text-secondary small mb-3" id="scanDurationText"></p>
         <div class="table-responsive">
             <table class="table table-custom">
                 <thead>
@@ -81,7 +82,7 @@ document.getElementById('startScanBtn').addEventListener('click', async () => {
             return;
         }
 
-        renderResults(data.devices);
+        renderResults(data.devices, data.scan_duration_seconds);
     } catch (err) {
         document.getElementById('scanStatus').classList.add('d-none');
         document.getElementById('startScanBtn').disabled = false;
@@ -89,7 +90,7 @@ document.getElementById('startScanBtn').addEventListener('click', async () => {
     }
 });
 
-function renderResults(devices) {
+function renderResults(devices, durationSeconds) {
     const tbody = document.getElementById('resultsTableBody');
     tbody.innerHTML = '';
 
@@ -112,6 +113,8 @@ function renderResults(devices) {
     });
 
     document.getElementById('resultCount').textContent = devices.length;
+    document.getElementById('scanDurationText').textContent =
+        `Scan completed in ${durationSeconds} seconds`;
     document.getElementById('scanResults').classList.remove('d-none');
 }
 </script>
