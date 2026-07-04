@@ -17,15 +17,29 @@ if (localStorage.getItem('theme') === 'dark') {
 }
 
 if (darkModeToggle) {
-    darkModeToggle.addEventListener('click', () => {
+    darkModeToggle.addEventListener('click', async () => {
         body.classList.toggle('dark-mode');
         const icon = darkModeToggle.querySelector('i');
-        if (body.classList.contains('dark-mode')) {
+        const isDark = body.classList.contains('dark-mode');
+
+        if (isDark) {
             icon.classList.replace('fa-moon', 'fa-sun');
             localStorage.setItem('theme', 'dark');
         } else {
             icon.classList.replace('fa-sun', 'fa-moon');
             localStorage.setItem('theme', 'light');
+        }
+
+        try {
+            const formData = new FormData();
+            formData.append('theme', isDark ? 'dark' : 'light');
+            const notifCheckbox = document.getElementById('emailNotif');
+            if (notifCheckbox && notifCheckbox.checked) {
+                formData.append('email_notifications', 'on');
+            }
+            await fetch("/settings/update-preferences", { method: 'POST', body: formData });
+        } catch (err) {
+            console.error('Failed to save theme preference:', err);
         }
     });
 }

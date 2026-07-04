@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% block title %}Settings{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+    <h4 class="mb-0">Settings</h4>
+    <p class="text-secondary mb-0">Manage your account preferences</p>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-6">
+        <div class="card-panel mb-4">
+            <h6 class="mb-3"><i class="fa-solid fa-user me-2"></i>Account Email</h6>
+            <form method="POST" action="{{ url_for('settings.update_email') }}">
+                <div class="mb-3">
+                    <label class="form-label">Email Address</label>
+                    <input type="email" name="email" class="form-control" value="{{ current_user.email }}" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Update Email</button>
+            </form>
+        </div>
+
+        <div class="card-panel">
+            <h6 class="mb-3"><i class="fa-solid fa-lock me-2"></i>Change Password</h6>
+            <form method="POST" action="{{ url_for('settings.update_password') }}">
+                <div class="mb-3">
+                    <label class="form-label">Current Password</label>
+                    <input type="password" name="current_password" class="form-control" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">New Password</label>
+                    <input type="password" name="new_password" class="form-control" required>
+                    <div class="form-text">At least 8 characters.</div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Confirm New Password</label>
+                    <input type="password" name="confirm_password" class="form-control" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Update Password</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="col-lg-6">
+        <div class="card-panel mb-4">
+            <h6 class="mb-3"><i class="fa-solid fa-sliders me-2"></i>Preferences</h6>
+            <form method="POST" action="{{ url_for('settings.update_preferences') }}">
+                <div class="mb-3">
+                    <label class="form-label">Theme</label>
+                    <select name="theme" class="form-select">
+                        <option value="light" {% if current_user.theme_preference == 'light' %}selected{% endif %}>Light</option>
+                        <option value="dark" {% if current_user.theme_preference == 'dark' %}selected{% endif %}>Dark</option>
+                    </select>
+                </div>
+                <div class="mb-3 form-check">
+                    <input type="checkbox" name="email_notifications" class="form-check-input" id="emailNotif"
+                           {% if current_user.email_notifications %}checked{% endif %}>
+                    <label class="form-check-label" for="emailNotif">
+                        Email me when a new device is discovered
+                    </label>
+                </div>
+                <button type="submit" class="btn btn-primary">Save Preferences</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-2">
+    <div class="col-12">
+        <div class="card-panel" style="border-color: var(--color-danger);">
+            <h6 class="mb-3 text-danger"><i class="fa-solid fa-triangle-exclamation me-2"></i>Danger Zone</h6>
+            <p class="text-secondary small">Deleting your account permanently removes all your scans, devices, and notifications. This cannot be undone.</p>
+            <form method="POST" action="{{ url_for('settings.delete_account') }}"
+                  onsubmit="return confirm('Are you absolutely sure? This cannot be undone.');">
+                <div class="mb-3">
+                    <label class="form-label">Type your username (<strong>{{ current_user.username }}</strong>) to confirm</label>
+                    <input type="text" name="confirm_username" class="form-control" required>
+                </div>
+                <button type="submit" class="btn btn-outline-danger">Delete My Account</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
