@@ -1,0 +1,13 @@
+{% extends "base_auth.html" %}
+{% block title %}Too Many Requests{% endblock %}
+
+{% block content %}
+<div class="auth-card text-center">
+    <i class="fa-solid fa-hourglass-half fa-2x text-warning mb-3"></i>
+    <h4>Slow down a little</h4>
+    <p class="text-secondary">
+        You've made too many attempts in a short time. Please wait a minute and try again.
+    </p>
+    <a href="{{ url_for('auth.login') }}" class="btn btn-primary w-100 mt-2">Back to Login</a>
+</div>
+{% endblock %}

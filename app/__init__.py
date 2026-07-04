@@ -13,6 +13,12 @@ def create_app():
     csrf.init_app(app)
     limiter.init_app(app)
 
+    from flask import render_template as _render_template, jsonify as _jsonify
+
+    @app.errorhandler(429)
+    def ratelimit_handler(e):
+        return _render_template('rate_limited.html'), 429
+
     # Tell Flask-Login which route to redirect unauthenticated users to
     login_manager.login_view = 'auth.login'
     login_manager.login_message = 'Please log in to access this page.'
