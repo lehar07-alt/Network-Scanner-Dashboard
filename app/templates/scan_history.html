@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+{% block title %}Scan History{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+    <h4 class="mb-0">Scan History</h4>
+    <p class="text-secondary mb-0">All previous network scans</p>
+</div>
+<div class="row g-3 mb-4">
+    <div class="col-md-6">
+        <div class="stat-card">
+            <div class="stat-icon bg-blue-soft"><i class="fa-solid fa-list-check"></i></div>
+            <p class="stat-value">{{ total_scans }}</p>
+            <p class="stat-label">Scans Matching Filters</p>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="stat-card">
+            <div class="stat-icon bg-green-soft"><i class="fa-solid fa-network-wired"></i></div>
+            <p class="stat-value">{{ total_devices_found }}</p>
+            <p class="stat-label">Total Devices Found</p>
+        </div>
+    </div>
+</div>
+
+<!-- Search / Filter / Sort controls -->
+<div class="card-panel mb-4">
+    <form method="GET" class="row g-2 align-items-end">
+        <div class="col-md-4">
+            <label class="form-label small">Search by target range</label>
+            <input type="text" name="search" class="form-control" placeholder="e.g. 192.168.1"
+                   value="{{ search_query }}">
+        </div>
+        <div class="col-md-3">
+            <label class="form-label small">Status</label>
+            <select name="status" class="form-select">
+                <option value="" {% if status_filter == '' %}selected{% endif %}>All</option>
+                <option value="completed" {% if status_filter == 'completed' %}selected{% endif %}>Completed</option>
+                <option value="failed" {% if status_filter == 'failed' %}selected{% endif %}>Failed</option>
+                <option value="running" {% if status_filter == 'running' %}selected{% endif %}>Running</option>
+            </select>
+        </div>
+        <div class="col-md-3">
+            <label class="form-label small">Sort</label>
+            <select name="sort" class="form-select">
+                <option value="newest" {% if sort_order == 'newest' %}selected{% endif %}>Newest first</option>
+                <option value="oldest" {% if sort_order == 'oldest' %}selected{% endif %}>Oldest first</option>
+            </select>
+        </div>
+        <div class="col-md-2">
+            <button type="submit" class="btn btn-primary w-100">
+                <i class="fa-solid fa-filter me-1"></i>Apply
+            </button>
+        </div>
+    </form>
+</div>
+
+<!-- Results table -->
+<div class="card-panel">
+    <div class="table-responsive">
+        <table class="table table-custom">
+            <thead>
+                <tr>
+                    <th>Target Range</th>
+                    <th>Status</th>
+                    <th>Devices Found</th>
+                    <th>Started</th>
+                    <th>Completed</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for scan in scans %}
+                <tr>
+                    <td>{{ scan.target_range }}</td>
+                    <td>
+                        {% if scan.status == 'completed' %}
+                            <span class="status-badge status-online">Completed</span>
+                        {% elif scan.status == 'failed' %}
+                            <span class="status-badge status-offline">Failed</span>
+                        {% else %}
+                            <span class="status-badge" style="background: rgba(217,119,6,0.12); color: var(--color-warning);">Running</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ scan.devices_found }}</td>
+                    <td>{{ scan.started_at.strftime('%b %d, %Y %I:%M %p') }}</td>
+                    <td>
+                        {% if scan.completed_at %}
+                            {{ scan.completed_at.strftime('%b %d, %Y %I:%M %p') }}
+                        {% else %}
+                            —
+                        {% endif %}
+                    </td>
+                    <td>
+                        <form method="POST" action="{{ url_for('scanner.delete_scan', scan_id=scan.id) }}"
+                              onsubmit="return confirm('Delete this scan? This cannot be undone.');" class="d-inline">
+                            <button type="submit" class="btn btn-sm btn-outline-danger">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="6" class="text-center text-secondary py-4">
+                        No scans found. <a href="{{ url_for('scanner.scan_page') }}">Run your first scan</a>.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
